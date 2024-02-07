@@ -20,13 +20,13 @@ group by concat(e.first_name,' ',e.last_name) -- Группируем по пр�
 order by average_income; --Сортируем по возрастанию средний доход от меньшего к большему
 
 select 
-	concat(e.first_name,' ',e.last_name) as name,
-	TO_CHAR(s.sale_date, 'Day') as weekday,
-	ROUND(SUM(s.quantity * p.price)) as income
-from sales s
+	concat(e.first_name,' ',e.last_name) as name, --Объединяем имя фамилию с таблицы employees
+	TO_CHAR(s.sale_date, 'Day') as weekday, --Вытягиваем день недели из даты в виде строки
+	ROUND(SUM(s.quantity * p.price)) as income -- считаем доход за дни недели с округлением
+from sales s -- Берем за основу sales
 inner join employees e on s.sales_person_id = e.employee_id -- Подключаем employees узнать продавца
-left join products p on s.product_id = p.product_id
-GROUP BY concat(e.first_name,' ',e.last_name),TO_CHAR(s.sale_date, 'Day'),extract (isodow from s.sale_date)
-ORDER BY extract (isodow from s.sale_date), concat(e.first_name,' ',e.last_name);
+left join products p on s.product_id = p.product_id -- Подключаем products узнать цену продукта
+GROUP BY concat(e.first_name,' ',e.last_name),TO_CHAR(s.sale_date, 'Day'),extract (isodow from s.sale_date) -- Группируем имена и даты
+ORDER BY extract (isodow from s.sale_date), concat(e.first_name,' ',e.last_name); --Сортируем по дням и имени
 
 
