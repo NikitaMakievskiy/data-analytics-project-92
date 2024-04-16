@@ -31,18 +31,26 @@ ORDER BY extract (isodow from s.sale_date), concat(e.first_name,' ',e.last_name)
 
 SELECT
     CASE
-        WHEN age BETWEEN 16 AND 25 THEN '16-25'
-        WHEN age BETWEEN 26 AND 40 THEN '26-40'
-        ELSE '40+'
-    END AS age_category,
-    COUNT(customer_id) AS count
+        WHEN age BETWEEN 16 AND 25 THEN '16-25' -- категория 16-25
+        WHEN age BETWEEN 26 AND 40 THEN '26-40' -- категория 26-40
+        ELSE '40+'   --  40+
+    END AS age_category, -- обозначили название столбца
+    COUNT(customer_id) AS count -- посчитали количество id в категориях
 FROM
-    customers c 
+    customers c -- подключили таблицу
 WHERE
-    age IS NOT NULL
+    age IS NOT null -- исключили нулевые строки
 GROUP BY
-    age_category
+    age_category  -- сгруппировали по категории
 ORDER BY
-    age_category;
+    age_category; -- отсортировали
 
+
+SELECT TO_CHAR(s.sale_date , 'YYYY-MM') AS selling_month, --преобразуем дату в YY-MM
+       COUNT(distinct s.customer_id) AS total_customers, --Считаем уникальных покупателей
+       round(sum(s.quantity * p.price ), 0) as income -- считаем income 
+FROM sales s -- подключили таблицу
+join products p ON s.product_id = p.product_id -- соеденили чтобы достать цену продукта
+GROUP BY TO_CHAR(s.sale_date , 'YYYY-MM') -- сгруппировали по месяцам продаж
+order by selling_month; -- отсортировали 
 
