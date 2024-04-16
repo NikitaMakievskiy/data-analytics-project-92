@@ -54,3 +54,22 @@ join products p ON s.product_id = p.product_id -- соеденили чтобы 
 GROUP BY TO_CHAR(s.sale_date , 'YYYY-MM') -- сгруппировали по месяцам продаж
 order by selling_month; -- отсортировали 
 
+with tab as (
+	select s.customer_id,
+	row_number() over (partition by s.customer_id order by sale_date) as rn,
+	s.sales_person_id,
+	s.sale_date,
+	s.product_id
+	from sales s
+) -- табличка для того чтобы убрать дубли при выводе в ней выводим все столбцы что нам понадобятся 
+select 
+	concat(c.first_name,' ',c.last_name)as customer, -- объединяем имя фамилию для одной ячейки у покупателя
+	first_value(t.sale_date) over (partition by t.customer_id order by t.sale_date) as sale_date, -- находим дату первой продажи
+	concat(e.first_name,' ',e.last_name) as seller -- объединяем имя фамилию для одной ячейки у продавца
+from tab t -- наша временная табличка
+join customers c on t.customer_id = c.customer_id -- отсюда возьмем имя фамилию покупателя
+join employees e on t.sales_person_id = e.employee_id -- отсюда возьмем имя фамилию продавца
+join products p on t.product_id = p.product_id -- здесь возьмем цену акционного продукта 
+where p.price = 0 and t.rn = 1 -- условия на акционный продукт , условие на первую запись в списке продаж 
+order by t.customer_id; --сортирвока по customer ID
+	
