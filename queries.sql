@@ -29,4 +29,20 @@ left join products p on s.product_id = p.product_id -- Подключаем prod
 GROUP BY concat(e.first_name,' ',e.last_name),TO_CHAR(s.sale_date, 'Day'),extract (isodow from s.sale_date) -- Группируем имена и даты
 ORDER BY extract (isodow from s.sale_date), concat(e.first_name,' ',e.last_name); --Сортируем по дням и имени
 
+SELECT
+    CASE
+        WHEN age BETWEEN 16 AND 25 THEN '16-25'
+        WHEN age BETWEEN 26 AND 40 THEN '26-40'
+        ELSE '40+'
+    END AS age_category,
+    COUNT(customer_id) AS count
+FROM
+    customers c 
+WHERE
+    age IS NOT NULL
+GROUP BY
+    age_category
+ORDER BY
+    age_category;
+
 
