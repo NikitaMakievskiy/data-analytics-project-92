@@ -1,41 +1,85 @@
-select count(customer_id) as customers_count from customers c;
+select count(customer_id) as customers_count from customers;
 
 select
-concat(e.first_name,' ',e.last_name) as seller, --объединяем имя фамилию с таблицы employees
-count(s.sales_id) as operation,--считаем количество сделок в sales
-floor(sum(s.quantity * p.price)) as income -- считаем доход умножая количество проданного продукта и его цену
-from sales s -- берем за основу sales
-inner join employees e on s.sales_person_id = e.employee_id -- подключаем employees узнать продавца
-left join products p on s.product_id = p.product_id -- подключаем products узнать цену продукта
-group by concat(e.first_name,' ',e.last_name) -- группируем по продавцу
-order by income desc -- сортируем по убыванию суммы дохода от большего к меньшему
+	concat(e.first_name,
+	' ',
+	e.last_name) as seller,
+	--объединяем имя фамилию
+	count(s.sales_id) as operation,
+	--считаем количество сделок в sales
+	floor(sum(s.quantity * p.price)) as income
+	-- считаем доход 
+from
+	sales s
+inner join employees e on
+	s.sales_person_id = e.employee_id
+	-- подключаем employees 
+left join products p on
+	s.product_id = p.product_id
+	-- подключаем products узнать
+group by
+	concat(e.first_name,
+	' ',
+	e.last_name)
+	-- группируем по продавцу
+order by
+	income desc
+	-- сортируем по убыванию суммы дохода
 limit 10;
 
 with tab as (
+    select
+        concat(e.first_name,' ',e.last_name) as seller, --объединяем имя фамилию
+        floor(avg(s.quantity * p.price)) as average_income --считаем средний доход
+    from sales s -- берем за основу sales
+    inner join employees e on s.sales_person_id = e.employee_id -- подключаем employees 
+    left join products p on s.product_id = p.product_id-- подключаем products
+    group by concat(e.first_name,' ',e.last_name) -- группируем по продавцу
+    order by average_income)--сортируем по возрастанию средний доход
 select
-concat(e.first_name,' ',e.last_name) as seller, --объединяем имя фамилию с таблицы employees
-floor(avg(s.quantity * p.price)) as average_income --считаем средний доход за сделку
-from sales s -- берем за основу sales
-inner join employees e on s.sales_person_id = e.employee_id -- подключаем employees узнать продавца
-left join products p on s.product_id = p.product_id-- подключаем products узнать цену продукта
-group by concat(e.first_name,' ',e.last_name) -- группируем по продавцу
-order by average_income)--сортируем по возрастанию средний доход от меньшего к большему
-select
-seller,
-average_income
+    seller,
+    average_income
 from tab
 where average_income < (select avg(average_income) from tab);
 
 
 select
-concat(e.first_name,' ',e.last_name) as seller, --объединяем имя фамилию с таблицы employees
-to_char(s.sale_date, 'day') as day_of_week, --вытягиваем день недели из даты в виде строки
-floor(sum(s.quantity * p.price)) as income -- считаем доход за дни недели с округлением
-from sales s -- берем за основу sales
-inner join employees e on s.sales_person_id = e.employee_id -- подключаем employees узнать продавца
-left join products p on s.product_id = p.product_id -- подключаем products узнать цену продукта
-group by concat(e.first_name,' ',e.last_name),to_char(s.sale_date, 'day'),extract (isodow from s.sale_date) -- группируем имена и даты
-order by extract (isodow from s.sale_date), concat(e.first_name,' ',e.last_name); --сортируем по дням и имени
+	concat(e.first_name,
+	' ',
+	e.last_name) as seller,
+	--объединяем имя фамилию с таблицы employees
+	to_char(s.sale_date,
+	'day') as day_of_week,
+	--вытягиваем день недели из даты в виде строки
+	floor(sum(s.quantity * p.price)) as income
+	-- считаем доход за дни недели с округлением
+from
+	sales s
+	-- берем за основу sales
+inner join employees e on
+	s.sales_person_id = e.employee_id
+	-- подключаем employees узнать продавца
+left join products p on
+	s.product_id = p.product_id
+	-- подключаем products узнать цену продукта
+group by
+	concat(e.first_name,
+	' ',
+	e.last_name),
+	to_char(s.sale_date,
+	'day'),
+	extract (isodow
+from
+	s.sale_date)
+	-- группируем имена и даты
+order by
+	extract (isodow
+from
+	s.sale_date),
+	concat(e.first_name,
+	' ',
+	e.last_name);
+--сортируем по дням и имени
 
 select
 case
