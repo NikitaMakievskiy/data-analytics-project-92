@@ -1,11 +1,9 @@
-select
-count(customer_id) as customers_count 
-from customers c;-- Считаем общее количество созданных записей в таблице customers
+select count(customer_id) as customers_count from customers c;-- Считаем количество записей в таблице customers
 
 select
-concat(e.first_name,' ',e.last_name) as seller,--Объединяем имя фамилию с таблицы employees
-count(s.sales_id) as operation,--Считаем количество сделок в sales
-floor(sum(s.quantity * p.price)) as income -- Считаем доход умножая количество на цену
+    concat(e.first_name,' ',e.last_name) as seller,--Объединяем имя фамилию с таблицы employees
+    count(s.sales_id) as operation,--Считаем количество сделок в sales
+    floor(sum(s.quantity * p.price)) as income -- Считаем доход умножая количество на цену
 from sales s -- Берем за основу sales
 inner join employees e on s.sales_person_id = e.employee_id -- Подключаем employees узнать продавца
 left join products p on s.product_id = p.product_id -- Подключаем products узнать цену продукта
@@ -15,24 +13,24 @@ limit 10;
 
 with tab as (
 select 
-	concat(e.first_name,' ',e.last_name) as seller, --Объединяем имя фамилию с таблицы employees
-	floor(avg(s.quantity * p.price)) as average_income --Считаем средний доход за сделку
+    concat(e.first_name,' ',e.last_name) as seller, --Объединяем имя фамилию с таблицы employees
+    floor(avg(s.quantity * p.price)) as average_income --Считаем средний доход за сделку
 from sales s -- Берем за основу sales
 inner join employees e on s.sales_person_id = e.employee_id -- Подключаем employees узнать продавца
 left join products p on s.product_id = p.product_id-- Подключаем products узнать цену продукта
 group by concat(e.first_name,' ',e.last_name) -- Группируем по продавцу
 order by average_income)--Сортируем по возрастанию средний доход от меньшего к большему
 select 
-	seller,
-	average_income
-	from tab
-	where average_income < (select avg(average_income) from tab);
+    seller,
+    average_income
+from tab
+where average_income < (select avg(average_income) from tab);
 
 
 select 
-	concat(e.first_name,' ',e.last_name) as seller, --Объединяем имя фамилию с таблицы employees
-	to_char(s.sale_date, 'day') as day_of_week, --Вытягиваем день недели из даты в виде строки
-	floor(sum(s.quantity * p.price)) as income -- считаем доход за дни недели с округлением
+    concat(e.first_name,' ',e.last_name) as seller, --Объединяем имя фамилию с таблицы employees
+    to_char(s.sale_date, 'day') as day_of_week, --Вытягиваем день недели из даты в виде строки
+    floor(sum(s.quantity * p.price)) as income -- считаем доход за дни недели с округлением
 from sales s -- Берем за основу sales
 inner join employees e on s.sales_person_id = e.employee_id -- Подключаем employees узнать продавца
 left join products p on s.product_id = p.product_id -- Подключаем products узнать цену продукта
