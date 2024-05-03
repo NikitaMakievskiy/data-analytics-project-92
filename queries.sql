@@ -1,4 +1,4 @@
-select count(customer_id) as customers_count from customers c;-- считаем общее количество записей
+select count(customer_id) as customers_count from customers c;
 
 select
 concat(e.first_name,' ',e.last_name) as seller, --объединяем имя фамилию с таблицы employees
@@ -44,14 +44,10 @@ when age between 26 and 40 then '26-40' -- категория 26-40
 else '40+'   --  40+
 end as age_category, -- обозначили название столбца
 count(customer_id) as age_count -- посчитали количество id в категориях
-from
-customers c -- подключили таблицу
-where
-age is not null -- исключили нулевые строки
-group by
-age_category  -- сгруппировали по категории
-order by
-age_category; -- отсортировали
+from customers c -- подключили таблицу
+where age is not null -- исключили нулевые строки
+group by age_category  -- сгруппировали по категории
+order by age_category; -- отсортировали
 
 
 select to_char(s.sale_date , 'yyyy-mm') as selling_month, --преобразуем дату в yy-mm
