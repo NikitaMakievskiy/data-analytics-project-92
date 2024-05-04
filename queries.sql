@@ -3,7 +3,7 @@ select count(customer_id) as customers_count from customers;
 select
     concat(e.first_name, ' ', e.last_name) as seller,
     --объединяем имя фамилию
-    count(s.sales_id) as operation,
+    count(s.sales_id) as operations,
     --считаем количество сделок в sales
     floor(sum(s.quantity * p.price)) as income
     -- считаем доход
@@ -112,8 +112,7 @@ with tab as (
         s.sales_person_id,
         s.sale_date,
         s.product_id,
-        row_number() over (partition by s.customer_id 
-        order by s.sale_date) as rn
+        row_number() over (partition by s.customer_id order by s.sale_date) as n
     from sales as s
 )-- табличка для того чтобы убрать дубли
 
@@ -134,7 +133,7 @@ inner join employees as e on t.sales_person_id = e.employee_id
 -- отсюда возьмем имя фамилию продавца
 inner join products as p on t.product_id = p.product_id
 -- здесь возьмем цену акционного продукта
-where p.price = 0 and t.rn = 1
+where p.price = 0 and t.n = 1
 -- условия на акционный продукт , условие на первую запись в списке продаж
 order by t.customer_id;
 --сортирвока по customer id
