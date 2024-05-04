@@ -112,9 +112,10 @@ with tab as (
         s.sales_person_id,
         s.sale_date,
         s.product_id,
-        row_number() over (partition by s.customer_id order by s.sale_date) as rn
+        row_number() over (partition by s.customer_id 
+        order by s.sale_date) as rn
     from sales as s
-)-- табличка для того чтобы убрать дубли 
+)-- табличка для того чтобы убрать дубли
 
 select
     concat(c.first_name, ' ', c.last_name) as customer,
